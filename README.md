@@ -4,7 +4,7 @@ This is a bot that simulates the experience of buying and selling shares of publ
 
 ## Demo
 
-To see this bot in action install Telegram Messenger and go here [https://telegram.me/WSSimBot](https://telegram.me/shoogi_bot). Type /start or /wsshelp to begin.
+To see this bot in action install Telegram Messenger and go here [https://telegram.me/WSSimBot](https://telegram.me/WSSimBot). Type /start or /wsshelp to begin.
 
 ### Code
 
