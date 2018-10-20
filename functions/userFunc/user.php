@@ -27,13 +27,6 @@ function create_user($tg_id, $username) {
 	$conn->query($sql);
 }
 
-
-function ban_user($tg_id) {
-	$conn = db_connect();
-	$sql = "UPDATE users SET banned='1' WHERE tg_id = " . $tg_id;
-	$conn->query($sql);
-}
-
 function get_cashbalance($tg_id){
 	$conn = db_connect();
 	$sql = "SELECT * FROM ledger WHERE tg_id = '" . $tg_id . "'";

@@ -51,9 +51,11 @@ function processMessage($message) {
     $html .= "Thank you for playing Wall Street Simulator. Here you can compete with your friends to see who can get the best returns. Please reference the following commands to play.\n\n";
     $html .= "/wssjoin - Type this to participate in the game. You will be granted 10,000 USD to begin trading. You only get one shot at this so don't lose all your money!\n\n";
     $html .= "/wsscashbalance - View your available funds which can be used to buy shares.\n\n";
+    $html .= "/wssquote [ticker] - Get a quote on a ticker of your choosing (Quotes may be delayed by 15 minutes).\n\n";
     $html .= "/wssbuy [ticker;quantity] - Purchase shares at anytime through this command. If you are unsure what ticker to type, search for it on finance.yahoo.com -- Whatever the ticker is on there will be the same one you type here.\n\n";
     $html .= "/wsssell [ticker;quantity] - Sell shares at anytime through this command.\n\n";
     $html .= "/wsspositions [username] - Look up your own positions or a friends through their username (leave blank if you want to lookup your own). This will give you a full breakdown of your positions and cash balance, along with your return.\n\n";
+    $html .= "/wsshistory - View transactions over the past 90 days\n\n";
     $html .= "/wssrules - Learn about the rules of the game.\n\n";
 
     $html .= "<em>¤The funds used in this game are made up and do not exist in real life. This game is purely for fun, competition and bragging rights.\n\n¤Quotes are based off of current Bid/Ask, however they may be delayed by 15 minutes.</em>";
@@ -84,6 +86,11 @@ function processMessage($message) {
       apiRequest("sendMessage", array('chat_id' => $chat_id, "text" => "Looks like you don't have a Telegram username. Please create one first then try again.", parse_mode => "HTML"));
     }
 
+  }
+
+  //COMMAND: wsshistory
+  if (strpos($text, "/wsshistory") === 0) {
+    apiRequest("sendMessage", array('chat_id' => $chat_id, "text" => "↓ View transaction history ↓\nhttps://joeltersigni.com/wssimbot", parse_mode => "HTML"));
   }
 
 
@@ -164,7 +171,7 @@ function processMessage($message) {
 
     $word = trim_command($text,"/wssbuy");
     $userInput = explode(";", $word);
-    $ticker = $userInput[0]; $quantity = $userInput[1];
+    $ticker = $userInput[0]; $quantity = abs($userInput[1]);
 
     //Check Valid request
     if(count($userInput) != 2){
@@ -202,7 +209,7 @@ function processMessage($message) {
 
     $word = trim_command($text,"/wsssell");
     $userInput = explode(";", $word);
-    $ticker = $userInput[0]; $quantity = $userInput[1];
+    $ticker = $userInput[0]; $quantity = abs($userInput[1]);
 
     if(count($userInput) != 2){
       apiRequest("sendMessage", array('chat_id' => $chat_id, "text" => "You improperly formatted your sell request. It should be /wsssell ticker;quantity. (ex. /wsssell amd;50)", parse_mode => "HTML"));
@@ -224,6 +231,36 @@ function processMessage($message) {
       apiRequest("sendMessage", array('chat_id' => $chat_id, "text" => $html, parse_mode => "HTML"));
     }
 
+  }
+
+
+  //COMMAND: wssquote
+  if (strpos($text, "/wssquote") === 0) {
+    $ticker = trim_command($text,"/wssquote");
+
+    if($quote = get_quote($ticker)){
+      $percentageChange = number_format(calc_percentage($quote->regularMarketPrice, $quote->regularMarketPreviousClose), 2);
+      $html .= "<b>" . $quote->longName . " (" . $quote->symbol . ")</b>\n";
+      if($quote->regularMarketChange > 0){
+        $html .= "▲ " . $quote->regularMarketPrice . " (" . number_format($quote->regularMarketChange, 2) . ") [" . $percentageChange . "%]\n";
+      } else {
+        $html .= "▼ " . $quote->regularMarketPrice . " (" . number_format($quote->regularMarketChange, 2) . ") [" . $percentageChange . "%]\n";
+      }
+      $html .= "<b>Bid:</b> " . $quote->bid . " // <b>Ask:</b> " . $quote->ask . "\n";
+      $html .= "<b>Market:</b> " . $quote->fullExchangeName . " - " . get_marketstate($quote->marketState) . "\n";
+      $html .= "<em>¤ Currency in " . $quote->currency . "</em>\n\n";
+
+      $html .= "/////////// TECHNICALS ///////////\n";
+      $html .= "<b>Day High:</b> " . $quote->regularMarketDayHigh . " // <b>Day Low:</b> " . $quote->regularMarketDayLow . "\n";
+      $html .= "<b>52W High:</b> " . $quote->fiftyTwoWeekHigh . " // <b>52W Low:</b> " . $quote->fiftyTwoWeekLow . "\n";
+      $html .= "<b>Volume:</b> " . number_format($quote->regularMarketVolume) . "\n";
+      $html .= "<b>Market Cap:</b> " . number_format($quote->marketCap) . "\n";
+
+      apiRequest("sendMessage", array('chat_id' => $chat_id, "text" => $html, parse_mode => "HTML"));
+
+    } else {
+      apiRequest("sendMessage", array('chat_id' => $chat_id, "text" => "Unable to retireve data on this ticker. Check that you typed the ticker correct (see if it works on Yahoo Finance too).", parse_mode => "HTML"));
+    }
   }
 
 ////////////////End process message

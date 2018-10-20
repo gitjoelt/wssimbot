@@ -1,0 +1,75 @@
+<html>
+	<head>
+		<title>Wall Street Simulator - Transactions</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link href="https://joeltersigni.com/css/pure/pure.css" rel="stylesheet">
+		<link href="https://joeltersigni.com/css/pure/pure-responsive.css" rel="stylesheet">
+		<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.4.1/css/all.css" integrity="sha384-5sAR7xN1Nv6T6+dT2mhtzEpVJvfS3NScPQTrOxhwjIuvcA67KV2R5Jz6kr4abQsz" crossorigin="anonymous">
+		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto">
+		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Passion+One">
+		<link rel="stylesheet" href='css/styles.css' type='text/css'>
+	</head>
+<body>
+
+<div id="dover">
+
+<section class="hero-header">
+	<div class="ioarea">
+		<div class="pure-g">
+			<div class="pure-u-1">
+				<h2><i class="fas fa-history"></i> Transactions over the last 90 days</h2>
+				<input type="text" v-model="userSearchText" v-on:keyup="filterByUser(userSearchText, $event)" placeholder="Filter By Username...">
+			</div>
+		</div>
+	</div>
+</section>
+
+<section class="errorarea" v-if="userSearchText.length > 0 && dbResponse.length <= 0">
+	<p>No results found for <span class="change-red">{{userSearchText}}<span></p>
+</section>
+
+<section class="ledger">
+
+		<div v-for="transaction in dataDisplay" class="entrylist">
+			<div class="pure-g">
+				<div class="pure-u-1 pure-u-lg-2-3">
+					<div class="transaction">
+					{{ transaction.username }} <i class="fas fa-exchange-alt"></i> <strong>{{ transaction.action }}</strong> {{ transaction.quantity }} <strong>{{ transaction.stock_ticker }}</strong> 
+					</div>
+				</div>
+				<div class="pure-u-1 pure-u-lg-1-3">
+					<template v-if="transaction.action == 'buy'">
+						<div class="change change-red">
+							-${{ transaction.cash_change }}
+							<div class="change-date">
+								{{ transaction.action_date }}
+							</div>
+						</div>
+					</template>
+					<template v-else>
+						<div class="change change-green">
+							+${{ transaction.cash_change }}
+							<div class="change-date">
+								{{ transaction.action_date }}
+							</div>
+						</div>
+					</template>
+				</div>
+			</div>
+		</div>
+
+		<div v-if="viewCount < dbResponse.length - 1" class="addmore" v-on:click="loadMore">
+			<i class="fas fa-angle-down"></i> Load More
+		</div>
+
+</section>
+
+</div>
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
