@@ -5,12 +5,18 @@ var app = new Vue({
         dataTemp: [],
         dataDisplay: [],
         viewCount: 0,
-        userSearchText: ''
+        userMatch: false,
+        mostTraded: '--',
+        ranking: '--',
+        userSearchText: '',
+        countdown: 60,
+        countdownText: 'Next update in 60 seconds'
     },
     methods: {
     	getLedger: vueGetFullLedger,
     	filterByUser: vueFilterByUser,
-    	loadMore: vueLoadMore
+    	loadMore: vueLoadMore,
+    	clickUsernameHandler: vueClickUsernameHandler
     }
 });
 
@@ -40,9 +46,17 @@ function vueFilterByUser(username, event) {
 		app.dbResponse = app.dataTemp;
 	}
 
+	//filter results by the user search
 	app.dbResponse = app.dbResponse.filter(function(transaction) {
 		return transaction.username.toLowerCase().indexOf(username.toLowerCase()) > -1;
 	});
+
+	//check if a complete username has been typed in order to display stats of that specific user
+	if(app.dbResponse.length > 0){
+		matchUser(app.dbResponse[0].username, username);
+	} else {
+		app.userMatch = false;
+	}
 
 	//reset
 	app.viewCount = 0;
@@ -61,15 +75,115 @@ function vueLoadMore(){
 	app.viewCount += amount;
 }
 
-vueGetFullLedger();
+function vueClickUsernameHandler(username){
+	setInputBox(username);
+	vueFilterByUser(username, []);
+}
 
-//refresh every 60 seconds
-/*
-setInterval(function(){
-	if(!app.userSearchText){
-		vueGetFullLedger();
-		console.log("Refreshed");
+function matchUser(displayText, searchText){
+
+	if(displayText.toLowerCase() === searchText.toLowerCase()){
+		app.userMatch = true;
+		getRanking(app.dbResponse[0].tg_id);
+		getMostTraded(app.dbResponse[0].tg_id);
 	} else {
-		console.log("Refresh Cancelled");
+		app.userMatch = false;
 	}
-}, 60000);*/
+}
+
+function setInputBox(username){
+	app.userSearchText = username;
+	//$('.enterUsername').select();
+}
+
+function getRanking(tg_id){
+	$.getJSON('https://joeltersigni.com/wssimbot/api/?tg_id=' + tg_id + '&position=true', function (data) {
+		if(data.position){
+			app.ranking = data.position;
+		} else {
+			app.ranking = "--";
+		}
+	});
+}
+
+function getMostTraded(tg_id){
+	$.getJSON('https://joeltersigni.com/wssimbot/api/?tg_id=' + tg_id + '&mosttraded=true', function (data) {
+		if(data.mostTraded){
+			app.mostTraded = data.mostTraded;
+		} else {
+			app.mostTraded = "--";
+		}
+	});
+}
+
+vueGetFullLedger();
+var seconds = setInterval(function(){
+				if(!app.userSearchText && app.viewCount == 20) {
+					if(app.countdown != 1){
+						app.countdown = app.countdown - 1;
+						app.countdownText = 'Next update in ' + app.countdown + ' seconds';
+					} else {
+						app.countdownText = 'Refreshing...';
+						vueGetFullLedger();
+						app.countdown = 60;
+					}
+				} else {
+					app.countdownText = 'Updates paused';
+					clearInterval(seconds);
+				}
+			}, 1000);
+
+
+
+var leaderboards = new Vue({
+    el: '#overlayarea',
+    data: {
+        ldrResponse: []
+    },
+    methods: {
+    	displayOrdinal: vueDisplayOrdinal
+    }
+});
+
+var menu = new Vue({
+    el: '#menuarea',
+    data: {
+       
+    },
+    methods: {
+    	getLeaderboard: vueGetLeaderboard,
+    	clickLeaderboardHandler: vueClickLeaderboardHandler
+    }
+});
+
+function vueClickLeaderboardHandler(){
+	vueGetLeaderboard();
+	$('.overlay').fadeIn();
+}
+
+function vueGetLeaderboard(){
+	$.getJSON('https://joeltersigni.com/wssimbot/api/?leaderboard=true', function (data) {
+		if(data){
+			leaderboards.ldrResponse = data;
+		}
+	});
+}
+
+function vueDisplayOrdinal(i) {
+    var j = i % 10,
+        k = i % 100;
+    if (j == 1 && k != 11) {
+        return i + "st";
+    }
+    if (j == 2 && k != 12) {
+        return i + "nd";
+    }
+    if (j == 3 && k != 13) {
+        return i + "rd";
+    }
+    return i + "th";
+}
+
+$('.overlayclose').click(function(){
+	$('.overlay').fadeOut();
+});

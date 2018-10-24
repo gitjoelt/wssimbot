@@ -14,6 +14,7 @@ require 'functions/userFunc/user.php';
 require 'functions/ledgerFunc/ledger.php';
 require 'functions/calcFunc/calc.php';
 require 'functions/lookupFunc/lookup.php';
+require 'functions/userFunc/leaderboards.php';
 
 
 //Get updates from Telegram
@@ -56,6 +57,7 @@ function processMessage($message) {
     $html .= "/wsssell [ticker;quantity] - Sell shares at anytime through this command.\n\n";
     $html .= "/wsspositions [username] - Look up your own positions or a friends through their username (leave blank if you want to lookup your own). This will give you a full breakdown of your positions and cash balance, along with your return.\n\n";
     $html .= "/wsshistory - View transactions over the past 90 days\n\n";
+    $html .= "/wsstop5 - View the top 5 traders playing this game, and your position among them.\n\n";
     $html .= "/wssrules - Learn about the rules of the game.\n\n";
 
     $html .= "<em>¤The funds used in this game are made up and do not exist in real life. This game is purely for fun, competition and bragging rights.\n\n¤Quotes are based off of current Bid/Ask, however they may be delayed by 15 minutes.</em>";
@@ -261,6 +263,33 @@ function processMessage($message) {
     } else {
       apiRequest("sendMessage", array('chat_id' => $chat_id, "text" => "Unable to retireve data on this ticker. Check that you typed the ticker correct (see if it works on Yahoo Finance too).", parse_mode => "HTML"));
     }
+  }
+
+  //COMMAND: wsstop5
+  if (strpos($text, "/wsstop5") === 0) {
+    if($leaderboards = get_leaderboards()){
+
+      $html .= "<b>TOP 5 TRADERS</b>\n\n";
+      for($x=0;$x <= 4; $x++){
+        $html .= "<b>" . $leaderboards[$x]['id'] . display_ordinal($leaderboards[$x]['id']) . ".</b>\n" . $leaderboards[$x]['username'] . "\n";
+        $html .= "<strong>Return:</strong> " . $leaderboards[$x]['return_cash'] . " [" . $leaderboards[$x]['return_percentage'] . "%]\n\n";
+      }
+
+      if($position = get_position_by_user($tg_id)) {
+        $html .= "You are in <b>" . $position . display_ordinal($position) . "</b> place with a return of <b>" . $leaderboards[$position-1]['return_cash'] . "</b> dollars.\nThere are " . count($leaderboards) . " total players.\n\n";
+      } else {
+        $html .= "Your ranking will be available next time the leaderboards are updated.\n\n";
+      }
+
+      $lastUpdated = date('M d, Y g:i a (T)', strtotime($leaderboards[0]['updated_date']));
+      $html .= "<em>Last updated " . $lastUpdated . "</em>";
+      apiRequest("sendMessage", array('chat_id' => $chat_id, "text" => $html, parse_mode => "HTML"));
+
+
+    } else {
+      apiRequest("sendMessage", array('chat_id' => $chat_id, "text" => "Leaderboards are not available at this time. Check back later.", parse_mode => "HTML"));
+    }
+
   }
 
 ////////////////End process message

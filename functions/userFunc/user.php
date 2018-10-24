@@ -27,6 +27,23 @@ function create_user($tg_id, $username) {
 	$conn->query($sql);
 }
 
+function get_users(){
+	
+	$conn = db_connect();
+	$sql = "SELECT * FROM users";
+	$result = $conn->query($sql);
+	
+	if($result->num_rows > 0){
+		while($row = $result->fetch_assoc()) {
+			$users[] = array("tg_id" => $row['tg_id'],
+						     "username" => $row['username']);
+		}
+		return $users;
+	}
+
+	return false;
+}
+
 function get_cashbalance($tg_id){
 	$conn = db_connect();
 	$sql = "SELECT * FROM ledger WHERE tg_id = '" . $tg_id . "'";
@@ -92,6 +109,24 @@ function no_of_positions($tg_id){
 			}
 		}
 		return count($positions);
+	} 
+
+	return false;
+
+}
+
+function get_most_traded($tg_id){
+	$conn = db_connect();
+	$sql = "SELECT * FROM ledger WHERE tg_id = '" . $tg_id . "'";
+	$result = $conn->query($sql);
+	if($result->num_rows > 0){
+
+		while($row = $result->fetch_assoc()) {
+			$positions[$row['stock_ticker']] += 1;
+		}
+		arsort($positions);
+		$top = array_slice($positions,0,1);
+		return key($top);
 	} 
 
 	return false;

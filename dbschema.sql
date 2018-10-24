@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Oct 15, 2018 at 03:11 PM
+-- Generation Time: Oct 24, 2018 at 06:32 PM
 -- Server version: 5.7.21-0ubuntu0.16.04.1
 -- PHP Version: 7.0.28-0ubuntu0.16.04.1
 
@@ -23,14 +23,16 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
--- Table structure for table `chatlog`
+-- Table structure for table `leaderboards`
 --
 
-CREATE TABLE `chatlog` (
+CREATE TABLE `leaderboards` (
   `id` int(11) NOT NULL,
-  `chatid` text NOT NULL,
-  `updateid` text NOT NULL,
-  `posted` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+  `tg_id` varchar(100) NOT NULL,
+  `username` text NOT NULL,
+  `return_cash` varchar(120) NOT NULL,
+  `return_percentage` varchar(100) NOT NULL,
+  `updated_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
@@ -70,9 +72,9 @@ CREATE TABLE `users` (
 --
 
 --
--- Indexes for table `chatlog`
+-- Indexes for table `leaderboards`
 --
-ALTER TABLE `chatlog`
+ALTER TABLE `leaderboards`
   ADD PRIMARY KEY (`id`);
 
 --
@@ -92,20 +94,20 @@ ALTER TABLE `users`
 --
 
 --
--- AUTO_INCREMENT for table `chatlog`
+-- AUTO_INCREMENT for table `leaderboards`
 --
-ALTER TABLE `chatlog`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+ALTER TABLE `leaderboards`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 --
 -- AUTO_INCREMENT for table `ledger`
 --
 ALTER TABLE `ledger`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=58;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=271;
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

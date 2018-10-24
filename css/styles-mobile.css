@@ -1,0 +1,79 @@
+@media only screen and (max-width: 960px) {
+
+	body{
+		font-size:12px;
+		position:relative;
+	}
+
+	.overlay{
+		background-color: rgba(0, 0, 0, 0.7);
+		width:100%;
+		height:100%;
+		z-index:2;
+		top:0;
+		position:absolute;
+		overflow:auto;
+		display:none;
+	}
+
+	.overlaybox{
+		margin:50px 15px 0 15px;
+	}
+
+	.menuarea ul{
+		display: block;
+	}
+
+	.menuarea li{
+		width: 100%;
+		display:block;
+		letter-spacing: normal;
+		position: relative;
+	}
+
+	.menuarea li > a
+	{
+		padding: 15px 0;
+	}
+
+	.ioarea{
+		padding:0 15px;
+	}
+
+	.ledgerinfo{
+		padding:10px 15px;
+	}
+
+	.hero-header input[type=text] {
+		width:100%;
+		padding:15px;
+		border:none;
+		font-size:1.5em;
+		color:#33435e;
+		font-weight:bold;
+		-webkit-border-radius: 5px;
+		-moz-border-radius: 5px;
+		border-radius: 5px;
+	}
+
+	.ledger{
+
+		padding:0 15px;
+		margin:25px auto;
+		max-width:960px;
+		-webkit-border-radius: 5px;
+		-moz-border-radius: 5px;
+		border-radius: 5px;
+	}
+
+	.userstatsarea{
+		padding:0 15px;
+	}
+
+	.tradesstatbox p
+	{
+		font-size:1.4em;
+	}
+
+
+}

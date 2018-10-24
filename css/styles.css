@@ -21,6 +21,62 @@ h2{
 	font-weight:100;
 }
 
+.overlay{
+	background-color: rgba(0, 0, 0, 0.8);
+	width:100%;
+	height:100%;
+	z-index:2;
+	top:0;
+	position:fixed;
+	overflow:auto;
+	display:none;
+}
+
+.overlayclose
+{
+	position:absolute;
+	top:15px;
+	width:100%;
+}
+
+.overlayclosetext
+{
+	color:white;
+	font-size:1.2em;
+	text-align:center;
+	font-weight:bold;
+	cursor:pointer;
+}
+
+.overlaybox{
+	position:relative;
+	max-width:960px;
+	margin:50px auto 0 auto;
+	background:white;
+}
+
+h2.ranking
+{
+	color:white;
+	font-family:'Passion One', cursive;
+	font-size:1em;
+	margin:0;
+	padding:0;
+	color:#2b374c;
+}
+
+.gold {
+	color:#FFD700;
+}
+
+.silver {
+	color:#C0C0C0;
+}
+
+.bronze {
+	color:#cd7f32;
+}
+
 .padbox-left
 {
 	padding:15px 15px 15px 0;
@@ -31,6 +87,49 @@ h2{
 	padding:15px 0 15px 15px;
 }
 
+.top-head{
+	width:100%;
+	background:#2b374c;
+	text-align:center;
+	font-size:1.1em;
+	color:white;
+}
+
+.menuarea{
+	max-width:960px;
+	margin:0 auto;
+}
+
+.menuarea ul{
+	display: inline-block;
+    list-style-type: none;
+    width: 100%;
+    letter-spacing: -0.31em;
+    padding: 0;
+    margin: 0;
+}
+
+.menuarea li{
+	width: 33.3%;
+    display: inline-block;
+    letter-spacing: normal;
+    position: relative;
+}
+
+.menuarea li > a
+{
+	text-align: center;
+	padding: 10px 0;
+	display:block;
+	color:white;
+	text-decoration:none;
+	cursor:pointer;
+}
+
+.menuarea li > a:hover{
+	background:#33435e;
+}
+
 .ledger{
 
 	margin:25px auto;
@@ -39,6 +138,19 @@ h2{
 	-webkit-border-radius: 5px;
 	-moz-border-radius: 5px;
 	border-radius: 5px;
+}
+
+.ledgerinfo{
+	padding:10px;
+	border-bottom:1px solid #CCC;
+}
+
+.ledgerinfotext{
+	max-width:960px;
+	margin:0 auto;
+	text-transform: uppercase;
+	color:#666;
+	font-size:0.9em;
 }
 
 .hero-header{
@@ -55,10 +167,10 @@ h2{
 
 .hero-header input[type=text] {
 	width:100%;
-	padding:10px;
+	padding:15px;
 	border:none;
-	font-size:1.1em;
-	color:#555;
+	font-size:1.5em;
+	color:#33435e;
 	font-weight:bold;
 	-webkit-border-radius: 5px;
 	-moz-border-radius: 5px;
@@ -95,6 +207,59 @@ h2{
 	text-align:center;
 	font-weight:bold;
 }
+
+.userstatsarea{
+	max-width:960px;
+	margin:15px auto;
+	background:white;
+}
+
+.tradesstatbox{
+	background:#33435e;
+	padding:20px;
+	text-align:center;
+	position: relative;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.tradesstatboxwhite{
+	background:white;
+}
+
+.tradesstatboxwhite p
+{
+	color:#777 !important;
+}
+
+.tradesstatbox h2
+{
+	color:white;
+	font-family:'Passion One', cursive;
+	font-size:1.5em;
+	margin:0;
+	padding:0;
+	color:#9ba9bf;
+}
+
+.tradesstatbox h2.icon
+{
+	color:white;
+	font-family:'Passion One', cursive;
+	font-size:1em;
+	margin:0;
+	padding:0;
+	color:#9ba9bf;
+}
+
+.tradesstatbox p
+{
+	margin:0;
+	padding:0;
+	color:white;
+	font-size:2em;
+}
+
 
 
 .entrylist:nth-child(odd) {

@@ -9,8 +9,68 @@
 		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto">
 		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Passion+One">
 		<link rel="stylesheet" href='css/styles.css' type='text/css'>
+		<link rel="stylesheet" href='css/styles-mobile.css' type='text/css'>
 	</head>
 <body>
+
+<section class="overlay" id="overlayarea">
+	<div class="overlayclose">
+		<div class="overlayclosetext">
+			<i class="fas fa-times"></i> Close
+		</div>
+	</div>
+	<div class="overlaybox">
+		<div class="entrylist" v-for="user in ldrResponse">
+			<div class="pure-g">
+				<div class="pure-u-1-3 pure-u-lg-10-24">
+					<div class="change">
+					
+						<template v-if="user.id == 1">
+						<span class="gold"><i class="fas fa-trophy"></i></span>
+						</template>
+						<template v-if="user.id == 2">
+						<span class="silver"><i class="fas fa-trophy"></i></span>
+						</template>
+						<template v-if="user.id == 3">
+						<span class="bronze"><i class="fas fa-trophy"></i></span>
+						</template>
+						{{ displayOrdinal(user.id) }}
+
+
+						<template v-if="user.return_cash.replace(',','') >= 0">
+						<div class="change-green" style="font-size:0.9em">
+						+{{user.return_cash}} [{{user.return_percentage}}%]
+						</div>
+						</template>
+						<template v-else>
+						<div class="change-red" style="font-size:0.9em">
+						{{user.return_cash}} [{{user.return_percentage}}%]
+						</div>
+						</template>
+
+					</div>
+				</div>
+				<div class="pure-u-2-3 pure-u-lg-14-24">
+					<div class="transaction">
+					{{ user.username }}
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+
+
+<section class="top-head">
+	<div class="menuarea" id="menuarea">
+		<ul>
+			<li><a href="https://telegram.me/WSSimBot"><i class="fab fa-telegram-plane"></i> Open Wallstreet Simulator</a></li>
+			<li><a @click="clickLeaderboardHandler()"><i class="fas fa-trophy"></i> View Leaderboard</a></li>
+			<li><a href="https://github.com/gitjoelt/wssimbot" target="_blank"><i class="far fa-question-circle"></i> About</a></li>
+		</ul>
+	</div>
+</section>
+
 
 <div id="dover">
 
@@ -18,27 +78,59 @@
 	<div class="ioarea">
 		<div class="pure-g">
 			<div class="pure-u-1">
-				<h2><i class="fas fa-history"></i> Transactions over the last 90 days</h2>
-				<input type="text" v-model="userSearchText" v-on:keyup="filterByUser(userSearchText, $event)" placeholder="Filter By Username...">
+				<!--<h2><i class="fas fa-history"></i> Transactions over the last 90 days</h2>-->
+				<input class="enterUsername" type="text" v-model="userSearchText" v-on:keyup="filterByUser(userSearchText, $event)" placeholder="Filter By Username...">
 			</div>
 		</div>
 	</div>
 </section>
 
+<div class="ledgerinfo">
+	<div class="ledgerinfotext">
+		<i class="fas fa-history"></i> Last 90 days – <i class="far fa-clock"></i> {{ countdownText }}
+	</div>
+</div>
+
 <section class="errorarea" v-if="userSearchText.length > 0 && dbResponse.length <= 0">
 	<p>No results found for <span class="change-red">{{userSearchText}}<span></p>
 </section>
 
-<section class="ledger">
+<section class="userstatsarea" v-if="userMatch">
+	<div class="pure-g">
+		<div class="pure-u-1-3">
+			<div class="tradesstatbox">
+				<h2 class="icon"><i class="fas fa-exchange-alt"></i></h2>
+				<h2>Trades</h2>
+				<p>{{ dbResponse.length - 1 }}</p>
+			</div>
+		</div>
+		<div class="pure-u-1-3">
+			<div class="tradesstatbox tradesstatboxwhite">
+				<h2 class="icon"><i class="fas fa-trophy"></i></h2>
+				<h2>Ranking</h2>
+				<p>{{ ranking }}</p>
+			</div>
+		</div>
+		<div class="pure-u-1-3">
+			<div class="tradesstatbox">
+				<h2 class="icon"><i class="fas fa-chart-area"></i></h2>
+				<h2>Most Traded</h2>
+				<p>{{ mostTraded }}</p>
+			</div>
+		</div>
+	</div>
+</section>
+
+<section class="ledger" v-if="dbResponse.length > 0">
 
 		<div v-for="transaction in dataDisplay" class="entrylist">
 			<div class="pure-g">
-				<div class="pure-u-1 pure-u-lg-2-3">
+				<div class="pure-u-2-3 pure-u-lg-2-3">
 					<div class="transaction">
-					{{ transaction.username }} <i class="fas fa-exchange-alt"></i> <strong>{{ transaction.action }}</strong> {{ transaction.quantity }} <strong>{{ transaction.stock_ticker }}</strong> 
+					<a v-on:click="clickUsernameHandler(transaction.username)">{{ transaction.username }}</a> <i class="fas fa-exchange-alt"></i> <strong>{{ transaction.action }}</strong> {{ transaction.quantity }} <strong>{{ transaction.stock_ticker }}</strong> @ {{ transaction.price }} ({{ transaction.currency }})
 					</div>
 				</div>
-				<div class="pure-u-1 pure-u-lg-1-3">
+				<div class="pure-u-1-3 pure-u-lg-1-3">
 					<template v-if="transaction.action == 'buy'">
 						<div class="change change-red">
 							-${{ transaction.cash_change }}

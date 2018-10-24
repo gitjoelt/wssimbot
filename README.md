@@ -6,7 +6,7 @@ This is a bot that simulates the experience of buying and selling shares of publ
 
 To see this bot in action install Telegram Messenger and go here [https://telegram.me/WSSimBot](https://telegram.me/WSSimBot). Type /start or /wsshelp to begin.
 
-In addition to the bot itself, there is a website component where you can view transaction history of all users participating in the game. [You can view that here](https://joeltersigni.com/wssimbot/).
+In addition to the bot itself, there is a website component where you can view transaction history, rankings, and other interesting information users participating in the game. [You can view that here](https://joeltersigni.com/wssimbot/).
 
 ### Code
 
