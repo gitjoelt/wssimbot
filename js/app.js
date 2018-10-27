@@ -1,3 +1,4 @@
+////// VUE COMPONENTS & FUNCTIONS
 var app = new Vue({
     el: '#dover',
     data: {
@@ -8,6 +9,8 @@ var app = new Vue({
         userMatch: false,
         mostTraded: '--',
         ranking: '--',
+        joinDate: '--',
+        totalTrades: '--',
         userSearchText: '',
         countdown: 60,
         countdownText: 'Next update in 60 seconds'
@@ -20,11 +23,14 @@ var app = new Vue({
     }
 });
 
-function vueGetFullLedger(){
+function vueGetFullLedger(params = {}, callback = function(){}){
 
 	$.getJSON('https://joeltersigni.com/wssimbot/api/', function (data) {
     	app.dbResponse = data;
     	app.dataTemp = data;
+    	
+    	//data is ready
+    	callback(params.username, params.event);
     	
     	//reset
 		app.viewCount = 0;
@@ -84,8 +90,7 @@ function matchUser(displayText, searchText){
 
 	if(displayText.toLowerCase() === searchText.toLowerCase()){
 		app.userMatch = true;
-		getRanking(app.dbResponse[0].tg_id);
-		getMostTraded(app.dbResponse[0].tg_id);
+		getUserInfo(app.dbResponse[0].tg_id);
 	} else {
 		app.userMatch = false;
 	}
@@ -96,43 +101,34 @@ function setInputBox(username){
 	//$('.enterUsername').select();
 }
 
-function getRanking(tg_id){
-	$.getJSON('https://joeltersigni.com/wssimbot/api/?tg_id=' + tg_id + '&position=true', function (data) {
+function getUserInfo(tg_id){
+	$.getJSON('https://joeltersigni.com/wssimbot/api/?tg_id=' + tg_id, function (data) {
+		
 		if(data.position){
 			app.ranking = data.position;
 		} else {
 			app.ranking = "--";
 		}
-	});
-}
 
-function getMostTraded(tg_id){
-	$.getJSON('https://joeltersigni.com/wssimbot/api/?tg_id=' + tg_id + '&mosttraded=true', function (data) {
 		if(data.mostTraded){
 			app.mostTraded = data.mostTraded;
 		} else {
 			app.mostTraded = "--";
 		}
+
+		if(data.joinDate){
+			app.joinDate = data.joinDate;
+		} else {
+			app.joinDate = "--";
+		}
+
+		if(data.totalTrades){
+			app.totalTrades = data.totalTrades;
+		} else {
+			app.totalTrades = "--";
+		}
 	});
 }
-
-vueGetFullLedger();
-var seconds = setInterval(function(){
-				if(!app.userSearchText && app.viewCount == 20) {
-					if(app.countdown != 1){
-						app.countdown = app.countdown - 1;
-						app.countdownText = 'Next update in ' + app.countdown + ' seconds';
-					} else {
-						app.countdownText = 'Refreshing...';
-						vueGetFullLedger();
-						app.countdown = 60;
-					}
-				} else {
-					app.countdownText = 'Updates paused';
-					clearInterval(seconds);
-				}
-			}, 1000);
-
 
 
 var leaderboards = new Vue({
@@ -184,6 +180,49 @@ function vueDisplayOrdinal(i) {
     return i + "th";
 }
 
+////////////////////////////////////////////////////////////////////////////
+
+////// PAGE LOAD
+var paramUsername = '';
+var url = new URL(window.location.href);
+paramUsername = url.searchParams.get("u");
+paramLeaderboard = url.searchParams.get("l");
+
+if(!paramUsername) {
+	vueGetFullLedger();
+} else {
+	var params = { username: paramUsername, event: [] };
+	vueGetFullLedger(params, vueClickUsernameHandler);
+}
+
+if(paramLeaderboard){
+	vueClickLeaderboardHandler();
+}
+
+//start timer for refresh
+var seconds = setInterval(function(){
+				if(!app.userSearchText && app.viewCount == 20) {
+					if(app.countdown != 1){
+						app.countdown = app.countdown - 1;
+						app.countdownText = 'Next update in ' + app.countdown + ' seconds';
+					} else {
+						app.countdownText = 'Refreshing...';
+						vueGetFullLedger();
+						app.countdown = 60;
+					}
+				} else {
+					app.countdownText = 'Updates paused';
+					clearInterval(seconds);
+				}
+			}, 1000);
+
+////////////////////////////////////////////////////////////////////////////
+
+
+////// UI CONFIG
 $('.overlayclose').click(function(){
 	$('.overlay').fadeOut();
 });
+
+////////////////////////////////////////////////////////////////////////////
+

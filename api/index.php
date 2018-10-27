@@ -13,18 +13,27 @@ header('Access-Control-Allow-Origin: *');
 header('Content-type:application/json;charset=utf-8');
 
 $tg_id = $_GET['tg_id'];
-$position = $_GET['position'];
-$mostTraded = $_GET['mosttraded'];
 $leaderboard = $_GET['leaderboard'];
 
-if($tg_id && $position) {
+if($tg_id) {
+
+	//ranking
 	$position = get_position_by_user($tg_id);
 	$position = $position . display_ordinal($position);
-	$position = array("position" => $position);
-	echo json_encode($position);
-} else if ($tg_id && $mostTraded) {
-	$mostTraded = array("mostTraded" => get_most_traded($tg_id));
-	echo json_encode($mostTraded);
+
+	//most traded
+	$mosttraded = get_most_traded($tg_id);
+
+	//join date
+	$joindate = get_joindate($tg_id);
+	$joindate = date('M d, Y', strtotime($joindate));
+
+	//total trades
+	$totaltrades = get_total_trades($tg_id);
+
+	$userinfo = array("position" => $position, "mostTraded" => $mosttraded, "joinDate" => $joindate, "totalTrades" => $totaltrades);
+	echo json_encode($userinfo); 
+
 } else if ($leaderboard) {
 	echo json_encode(get_leaderboards());
 } else {

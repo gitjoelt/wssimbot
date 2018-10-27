@@ -92,7 +92,8 @@ function processMessage($message) {
 
   //COMMAND: wsshistory
   if (strpos($text, "/wsshistory") === 0) {
-    apiRequest("sendMessage", array('chat_id' => $chat_id, "text" => "↓ View transaction history ↓\nhttps://joeltersigni.com/wssimbot", parse_mode => "HTML"));
+    $html = "<a href='https://joeltersigni.com/wssimbot/'>➥View Trade History</a>";
+    apiRequest("sendMessage", array('chat_id' => $chat_id, "text" => $html, parse_mode => "HTML"));
   }
 
 
@@ -150,6 +151,7 @@ function processMessage($message) {
       $balance = $balance + $positions['cashbalance'];
       $html .= "<b>Balance:</b> $" . number_format($balance, 2) . "\n";
       $html .= "<b>Return:</b> " . number_format(calc_capitalgain($balance, 10000), 2) . " [" .number_format(calc_percentage($balance, 10000),2) . "%]\n";
+      $html .= "<a href='https://joeltersigni.com/wssimbot/?u=" . $username . "'>➥View Trade History</a>\n";
       $html .= "<em>¤ Cash, Balance, and Return calculated in USD</em>";
       apiRequest("sendMessage", array('chat_id' => $chat_id, "text" => $html, parse_mode => "HTML"));
     } else {
@@ -165,11 +167,6 @@ function processMessage($message) {
       apiRequest("sendMessage", array('chat_id' => $chat_id, "text" => "You aren't participating in the game. Type /wssjoin to join.", parse_mode => "HTML"));
       exit;
     }
-    //Check no more than 6 positions
-    if(no_of_positions($tg_id) >= 6){
-      apiRequest("sendMessage", array('chat_id' => $chat_id, "text" => "Buy order failed. You cannot own more than 6 positions at one time.", parse_mode => "HTML"));
-      exit;
-    }
 
     $word = trim_command($text,"/wssbuy");
     $userInput = explode(";", $word);
@@ -179,6 +176,15 @@ function processMessage($message) {
     if(count($userInput) != 2){
       apiRequest("sendMessage", array('chat_id' => $chat_id, "text" => "You improperly formatted your buy request. It should be /wssbuy ticker;quantity. (ex. /wssbuy amd;50)", parse_mode => "HTML"));
       exit;
+    }
+
+    //Check no more than 6 positions
+    $sharesExist = get_shares($tg_id, $ticker);
+    if(!$sharesExist){
+      if(no_of_positions($tg_id) >= 6){
+        apiRequest("sendMessage", array('chat_id' => $chat_id, "text" => "Buy order failed. You cannot own more than 6 positions at one time.", parse_mode => "HTML"));
+        exit;
+      }
     }
 
     if($quote = get_quote($ticker)){
@@ -212,6 +218,11 @@ function processMessage($message) {
     $word = trim_command($text,"/wsssell");
     $userInput = explode(";", $word);
     $ticker = $userInput[0]; $quantity = abs($userInput[1]);
+
+    if($quantity <= 0){
+      apiRequest("sendMessage", array('chat_id' => $chat_id, "text" => "Improper order quantity. Must be a number higher than zero.", parse_mode => "HTML"));
+      exit;
+    }
 
     if(count($userInput) != 2){
       apiRequest("sendMessage", array('chat_id' => $chat_id, "text" => "You improperly formatted your sell request. It should be /wsssell ticker;quantity. (ex. /wsssell amd;50)", parse_mode => "HTML"));
@@ -276,11 +287,12 @@ function processMessage($message) {
       }
 
       if($position = get_position_by_user($tg_id)) {
-        $html .= "You are in <b>" . $position . display_ordinal($position) . "</b> place with a return of <b>" . $leaderboards[$position-1]['return_cash'] . "</b> dollars.\nThere are " . count($leaderboards) . " total players.\n\n";
+        $html .= "You are in <b>" . $position . display_ordinal($position) . "</b> place with a return of <b>" . $leaderboards[$position-1]['return_cash'] . "</b> dollars.\nThere are " . count($leaderboards) . " total players.\n";
       } else {
-        $html .= "Your ranking will be available next time the leaderboards are updated.\n\n";
+        $html .= "Your ranking will be available next time the leaderboards are updated.\n";
       }
 
+      $html .= "<a href='https://joeltersigni.com/wssimbot/?l=show'>➥View Full Leaderboard</a>\n\n";
       $lastUpdated = date('M d, Y g:i a (T)', strtotime($leaderboards[0]['updated_date']));
       $html .= "<em>Last updated " . $lastUpdated . "</em>";
       apiRequest("sendMessage", array('chat_id' => $chat_id, "text" => $html, parse_mode => "HTML"));

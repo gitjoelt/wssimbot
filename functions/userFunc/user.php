@@ -148,4 +148,24 @@ function get_shares($tg_id, $ticker){
 	return false;
 }
 
+function get_joindate($tg_id){
+	$conn = db_connect();
+	$sql = "SELECT action_date FROM ledger WHERE tg_id = '" . $tg_id . "' AND action =''";
+	$result = $conn->query($sql);
+	if($result->num_rows){ 
+		$row = $result->fetch_row();
+		return $row[0];
+	} else { return false; }
+}
+
+function get_total_trades($tg_id){
+	$conn = db_connect();
+	$sql = "SELECT * FROM ledger WHERE tg_id = '" . $tg_id . "'";
+	$result = $conn->query($sql);
+	if($result->num_rows){ 
+		$tradeno = $result->num_rows - 1;
+		return $tradeno;
+	} else { return false; }
+}
+
 ?>
