@@ -1,10 +1,9 @@
 <?php
 
 function convert_currency($amount, $fromCurrencyCode, $toCurrencyCode = "USD"){
-	$query =  "{$fromCurrencyCode}_{$toCurrencyCode}";
-	$json = file_get_contents("https://free.currencyconverterapi.com/api/v6/convert?q=" . $query . "&compact=ultra");
+	$json = file_get_contents("https://api.exchangeratesapi.io/latest?base=" . $fromCurrencyCode . "&symbols=" . $toCurrencyCode);
 	$response = json_decode($json);
-	$val = $response->{"$query"};
+	$val = $response->rates->{"$toCurrencyCode"};
 	$total = $val * $amount;
 	return $total;
 }
@@ -23,7 +22,7 @@ function calc_costavg($prevpps, $prevquantity, $pps, $quantity){
 		$totalshares = $prevquantity + $quantity;
 		$costavg = $costavg / $totalshares;
 		return $costavg;
-	} 
+	}
 
 	return $pps;
 }
